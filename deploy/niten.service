@@ -6,7 +6,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=/opt/niten
-ExecStart=/usr/bin/node server/index.js
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning server/index.js
 Restart=always
 User=www-data
 Environment=NODE_ENV=production

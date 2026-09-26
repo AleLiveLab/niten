@@ -1,14 +1,30 @@
 const fs = require('fs');
 const path = require('path');
-const Database = require('better-sqlite3');
+// SQLite integrado en Node (node:sqlite): no requiere compilar nada al instalar
+const { DatabaseSync } = require('node:sqlite');
 const config = require('./config');
 
 fs.mkdirSync(config.dataDir, { recursive: true });
 fs.mkdirSync(config.uploadsDir, { recursive: true });
 
-const db = new Database(path.join(config.dataDir, 'niten.db'));
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+const db = new DatabaseSync(path.join(config.dataDir, 'niten.db'));
+db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
+
+// db.transaction(fn) devuelve una función que ejecuta fn dentro de una transacción
+// (con savepoints, así se pueden anidar)
+let depth = 0;
+db.transaction = (fn) => (...args) => {
+  const sp = `sp${depth++}`;
+  db.exec(`SAVEPOINT ${sp}`);
+  try {
+    const result = fn(...args);
+    db.exec(`RELEASE ${sp}`);
+    return result;
+  } catch (e) {
+    db.exec(`ROLLBACK TO ${sp}; RELEASE ${sp}`);
+    throw e;
+  } finally { depth--; }
+};
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS sellers (

@@ -8,4 +8,4 @@ COPY . .
 ENV NODE_ENV=production DATA_DIR=/app/data UPLOADS_DIR=/app/uploads
 VOLUME ["/app/data", "/app/uploads"]
 EXPOSE 3000
-CMD ["node", "server/index.js"]
+CMD ["node", "--disable-warning=ExperimentalWarning", "server/index.js"]

@@ -5,18 +5,17 @@
   "main": "server/index.js",
   "private": true,
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "node --watch server/index.js",
-    "seed": "node server/seed.js",
-    "reset": "node server/seed.js --reset"
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "seed": "node --disable-warning=ExperimentalWarning server/seed.js",
+    "reset": "node --disable-warning=ExperimentalWarning server/seed.js --reset"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13"
   },
   "license": "UNLICENSED",
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^13.0.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",

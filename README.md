@@ -18,7 +18,7 @@ Está hecha en **Node.js + SQLite**, sin build ni base de datos externa: corre i
 
 ## 1. Correrlo en tu PC
 
-Necesitás [Node.js 20 o superior](https://nodejs.org).
+Necesitás [Node.js 22.13 o superior](https://nodejs.org) (la versión LTS actual sirve). No hace falta Python ni compiladores: la base de datos usa el SQLite que ya trae Node.
 
 ```bash
 npm install
