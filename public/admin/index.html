@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Panel · NITEN 3D</title>
+  <title>Panel</title>
   <meta name="robots" content="noindex">
-  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/brand/favicon">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/admin/admin.css">
 </head>
 <body>
   <section class="login" id="login" hidden>
     <form class="login-card" id="loginForm">
-      <div class="brand"><span class="logo-mark"><i></i><i></i><i></i></span> NITEN 3D</div>
+      <div class="brand" data-brand></div>
       <h1>Ingresar al panel</h1>
       <label>Email<input name="email" type="email" required autocomplete="username"></label>
       <label>Contraseña<input name="password" type="password" required autocomplete="current-password"></label>
@@ -23,7 +23,7 @@
 
   <div class="layout" id="app" hidden>
     <aside class="sidebar" id="sidebar">
-      <div class="brand"><span class="logo-mark"><i></i><i></i><i></i></span> NITEN 3D</div>
+      <div class="brand" data-brand></div>
       <nav id="menu"></nav>
       <div class="me"><span id="meName"></span><a href="/" target="_blank">Ver tienda ↗</a><button id="logout">Salir</button></div>
     </aside>

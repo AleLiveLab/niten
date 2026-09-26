@@ -17,6 +17,7 @@ const social = require('../services/social');
 const wa = require('../services/whatsapp');
 const ml = require('../services/mercadolibre');
 const mp = require('../services/mercadopago');
+const brand = require('../services/brand');
 
 const router = express.Router();
 const admin = auth.requireRole('admin');
@@ -88,6 +89,27 @@ router.post('/api/admin/upload', admin, upload.array('files', 10), wrap(async (r
   res.json({ urls });
 }));
 
+/* ---------- Marca ---------- */
+const logoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, cb) => cb(null, /^image\/(jpeg|png|webp|gif|avif|svg\+xml)$/.test(file.mimetype)),
+});
+router.get('/api/admin/brand', admin, (req, res) => res.json({ current: brand.current(), variants: brand.variants() }));
+router.post('/api/admin/brand/logo', admin, logoUpload.single('file'), wrap(async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Subí una imagen PNG, JPG, WEBP o SVG' });
+  try { res.json({ url: await brand.saveLogo(req.file.buffer) }); } catch { res.status(400).json({ error: 'No se pudo leer la imagen' }); }
+}));
+router.put('/api/admin/brand', admin, (req, res) => res.json(brand.apply(req.body)));
+router.post('/api/admin/brand/variants', admin, (req, res) => res.json(brand.addVariant(req.body)));
+router.put('/api/admin/brand/variants/:id', admin, (req, res) => res.json(brand.updateVariant(req.params.id, req.body)));
+router.delete('/api/admin/brand/variants/:id', admin, (req, res) => { brand.removeVariant(req.params.id); res.json({ ok: true }); });
+router.post('/api/admin/brand/variants/:id/apply', admin, (req, res) => {
+  const v = brand.findVariant(req.params.id);
+  if (!v) return res.status(404).json({ error: 'Variante inexistente' });
+  res.json(brand.apply(v));
+});
+
 /* ---------- Productos y categorías ---------- */
 router.get('/api/admin/products', admin, (req, res) => {
   res.json(db.prepare('SELECT p.*, c.name category FROM products p LEFT JOIN categories c ON c.id = p.category_id ORDER BY p.sort, p.id').all().map(productFromRow));
@@ -146,13 +168,16 @@ router.get('/api/admin/content', admin, (req, res) => res.json(Object.fromEntrie
 router.put('/api/admin/content/:key', admin, (req, res) => {
   if (!CONTENT_KEYS.includes(req.params.key)) return res.status(400).json({ error: 'Sección desconocida' });
   if (typeof req.body !== 'object' || Array.isArray(req.body)) return res.status(400).json({ error: 'Formato inválido' });
-  setContent(req.params.key, req.body);
+  // nombre, logo y color se manejan desde "Marca"; acá se conservan
+  const value = req.params.key === 'site' ? { ...req.body, ...brand.current() } : req.body;
+  setContent(req.params.key, value);
   res.json({ ok: true });
 });
 router.post('/api/admin/content/:key/reset', admin, (req, res) => {
   if (!CONTENT_KEYS.includes(req.params.key)) return res.status(400).json({ error: 'Sección desconocida' });
-  setContent(req.params.key, defaults[req.params.key]);
-  res.json(defaults[req.params.key]);
+  const value = req.params.key === 'site' ? { ...defaults.site, ...brand.current() } : defaults[req.params.key];
+  setContent(req.params.key, value);
+  res.json(value);
 });
 
 /* ---------- Cupones ---------- */

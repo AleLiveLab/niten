@@ -66,6 +66,7 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.08; letter-spacing
 }
 .header.scrolled { border-color: var(--line); background: color-mix(in srgb, var(--bg) 88%, transparent); }
 .logo { display: inline-flex; align-items: center; gap: .6rem; font-family: var(--font-display); font-weight: 700; font-size: 1.25rem; letter-spacing: .08em; }
+.logo-img { height: 40px; width: auto; max-width: 190px; object-fit: contain; }
 .logo-mark { display: grid; gap: 3px; justify-items: center; }
 .logo-mark i { display: block; height: 6px; border-radius: 3px; background: var(--grad); animation: layer 3s var(--ease) infinite; transform-origin: left; }
 .logo-mark i:nth-child(1) { width: 12px; animation-delay: .4s; }
@@ -385,6 +386,10 @@ h1, h2, h3 { font-family: var(--font-display); line-height: 1.08; letter-spacing
 .timeline li.done::before { background: var(--grad); animation: pop .6s var(--ease); }
 .order-items { list-style: none; padding: 0; display: grid; gap: 8px; }
 .order-items li { display: flex; justify-content: space-between; gap: 1rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
+
+/* Aviso de vista previa de marca */
+.brand-preview { position: fixed; left: 50%; top: calc(var(--header-h) + 44px); transform: translateX(-50%); z-index: 60; width: max-content; max-width: calc(100% - 32px); padding: .6rem 1.1rem; border-radius: 999px; background: var(--text); color: var(--bg); font-size: .88rem; font-weight: 600; box-shadow: var(--shadow); text-align: center; }
+.brand-preview a { text-decoration: underline; margin-left: .4rem; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 960px) {

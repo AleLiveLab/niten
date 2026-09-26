@@ -18,6 +18,10 @@ function seed() {
     if (getContent(key) === null) setContent(key, value);
   }
 
+  // El saludo original tenía el nombre escrito a mano: pasa a usar {tienda}
+  const bot = getContent('bot');
+  if (bot?.greeting === '¡Hola {nombre}! 👋 Soy el asistente de *NITEN 3D*.') setContent('bot', { ...bot, greeting: defaults.bot.greeting });
+
   if (!db.prepare("SELECT 1 FROM users WHERE role = 'admin'").get()) {
     db.prepare("INSERT INTO users (email, name, password_hash, role) VALUES (?, ?, ?, 'admin')")
       .run(config.admin.email.toLowerCase(), 'Administrador', bcrypt.hashSync(config.admin.password, 10));

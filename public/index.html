@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NITEN 3D · Impresiones 3D</title>
+  <title>Impresiones 3D</title>
   <meta name="description" content="Figuras articuladas, lámparas, decoración y accesorios impresos en 3D.">
   <meta name="theme-color" content="#0b0714">
-  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/brand/favicon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,7 +16,7 @@
   <div class="announce" id="announce"><div class="announce-track"></div></div>
 
   <header class="header" id="header">
-    <a href="#" class="logo" id="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="logo-text">NITEN 3D</span></a>
+    <a href="#" class="logo" id="logo" data-brand></a>
     <nav class="nav" id="nav">
       <a href="#catalogo">Catálogo</a>
       <a href="#personalizado">Personalizados</a>
@@ -115,7 +115,7 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      <div><a href="#" class="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="logo-text" id="footerName">NITEN 3D</span></a><p id="footerTagline"></p></div>
+      <div><a href="#" class="logo" data-brand></a><p id="footerTagline"></p></div>
       <div class="footer-links" id="footerLinks"></div>
     </div>
     <p class="copy">© <span id="year"></span> <span id="copyName"></span> · Hecho capa por capa</p>
@@ -199,6 +199,7 @@
     </div>
   </div>
 
+  <div class="brand-preview" id="brandPreview" hidden>👀 Vista previa de la marca <strong data-brand-name></strong> — los clientes siguen viendo la marca actual. <a href="/">Salir de la vista previa</a></div>
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <script src="/js/store.js" type="module"></script>
 </body>

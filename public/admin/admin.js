@@ -1,4 +1,4 @@
-import { money, esc, api, toast } from '/js/common.js';
+import { money, esc, api, toast, brandHTML, applyBrand } from '/js/common.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -120,7 +120,7 @@ function last30(rows) {
 
 /* ================= Vistas ================= */
 const ADMIN_MENU = [
-  ['dashboard', '📊', 'Resumen'], ['pedidos', '🧾', 'Pedidos'], ['productos', '🧩', 'Productos'], ['contenido', '🎨', 'Contenido del sitio'],
+  ['dashboard', '📊', 'Resumen'], ['pedidos', '🧾', 'Pedidos'], ['productos', '🧩', 'Productos'], ['marca', '🏷️', 'Marca y logo'], ['contenido', '🎨', 'Contenido del sitio'],
   ['sep', 'Ventas'], ['cupones', '🎟️', 'Cupones'], ['vendedores', '🧑‍💼', 'Vendedores'],
   ['sep', 'Canales'], ['redes', '📣', 'Redes sociales'], ['whatsapp', '💬', 'Bot de WhatsApp'], ['mercadolibre', '🛒', 'MercadoLibre'],
   ['sep', 'Sistema'], ['integraciones', '🔌', 'Integraciones'], ['cuenta', '👤', 'Mi cuenta'],
@@ -327,9 +327,123 @@ views.producto = async (id) => {
   }
 };
 
+/* ---------- Marca ---------- */
+const brandMock = (b, kind) => `<div class="brand-mock ${kind}">${brandHTML(b)}<span class="accent-bar" style="background:${esc(b.accent)}"></span></div>`;
+function brandForm(b, id) {
+  return `<div class="form">
+    <label class="f">Nombre de la pyme<input name="name" value="${esc(b.name)}" required maxlength="60"></label>
+    <label class="f">Color principal<input type="color" name="accent" value="${esc(b.accent || '#ff5a1f')}"></label>
+    <label class="f full">Frase / eslogan<input name="tagline" value="${esc(b.tagline)}" maxlength="160"></label>
+    <div class="f full">Logo <span class="hint">PNG con fondo transparente o SVG. Se ve mejor si es horizontal.</span>
+      <div class="logo-drop"><div class="box" id="${id}Box">${b.logo ? `<img src="${esc(b.logo)}" alt="">` : '<span class="muted small">Sin logo</span>'}</div>
+        <input type="hidden" name="logo" value="${esc(b.logo)}">
+        <label class="btn sm">⬆ Subir logo<input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden data-logo-file="${id}"></label>
+        <button type="button" class="btn sm danger" data-logo-clear="${id}" ${b.logo ? '' : 'hidden'}>Quitar</button></div></div>
+    <div class="f full">Mostrar en el encabezado<div class="modes">${[['logo+name', 'Logo + nombre'], ['logo', 'Solo logo'], ['name', 'Solo nombre']].map(([v, l]) => `<label><input type="radio" name="logoMode" value="${v}" ${(b.logoMode || 'logo+name') === v ? 'checked' : ''}>${l}</label>`).join('')}</div></div>
+  </div>`;
+}
+const readBrand = (el) => { const v = (n) => el.querySelector(`[name=${n}]`).value; return { name: v('name'), tagline: v('tagline'), accent: v('accent'), logo: v('logo'), logoMode: (el.querySelector('[name=logoMode]:checked') || {}).value }; };
+// Subida y borrado de logo en cualquier formulario de marca (panel o modal)
+function bindLogo(root, id, onChange) {
+  const form = { get logo() { return root.querySelector('[name=logo]'); } };
+  root.querySelector(`[data-logo-file="${id}"]`).onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const fd = new FormData(); fd.append('file', file);
+    const res = await fetch('/api/admin/brand/logo', { method: 'POST', body: fd });
+    const data = await res.json();
+    e.target.value = '';
+    if (!res.ok) return err(new Error(data.error));
+    form.logo.value = data.url;
+    root.querySelector(`#${id}Box`).innerHTML = `<img src="${esc(data.url)}" alt="">`;
+    root.querySelector(`[data-logo-clear="${id}"]`).hidden = false;
+    onChange();
+  };
+  root.querySelector(`[data-logo-clear="${id}"]`).onclick = (e) => {
+    form.logo.value = '';
+    root.querySelector(`#${id}Box`).innerHTML = '<span class="muted small">Sin logo</span>';
+    e.target.hidden = true;
+    onChange();
+  };
+}
+
+views.marca = async () => {
+  setPage('Marca y logo', '<a class="btn" href="/" target="_blank">Ver tienda ↗</a>');
+  const { current, variants } = await api('/api/admin/brand');
+  const origin = location.origin;
+  const same = (v) => ['name', 'tagline', 'logo', 'logoMode', 'accent'].every((k) => (v[k] || '') === (current[k] || ''));
+  view.innerHTML = `
+    <div class="cols-2">
+      <form class="panel" id="bf"><h3>Marca actual <span class="tag ok">la ven los clientes</span></h3>${brandForm(current, 'cur')}
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:16px"><button class="btn primary">💾 Guardar y publicar</button><button type="button" class="btn" id="saveAsVariant">＋ Guardar como variante</button></div></form>
+      <div class="panel"><h3>Así se ve</h3><div style="display:grid;gap:12px" id="mocks"></div>
+        <p class="hint" style="margin-top:12px">El logo también se usa como ícono de la pestaña del navegador y en las imágenes que se generan para redes sociales.</p>
+        <h3 style="margin-top:18px">Imagen para redes <button type="button" class="btn sm" id="promoBtn">Generar</button></h3><div class="preview" id="promoPrev" style="position:static"></div></div>
+    </div>
+    <div class="panel"><h3>Variantes para comparar <button type="button" class="btn sm primary" id="newVariant">＋ Nueva variante</button></h3>
+      <p class="hint" style="margin-bottom:14px">Guardá distintas combinaciones de nombre y logo. Con <b>Vista previa</b> ves la tienda completa con esa marca sin que la vean tus clientes, y podés mandar el link a quien quieras para que opine. Cuando te decidas, tocá <b>Usar esta</b>.</p>
+      <div class="variants">${variants.map((v) => `<div class="variant ${same(v) ? 'active' : ''}">
+        ${brandMock(v, 'dark')}
+        <p><strong>${esc(v.name)}</strong>${same(v) ? ' <span class="tag ok">en uso</span>' : ''}<br><span class="muted small">${esc(v.tagline)}</span></p>
+        <div class="actions">
+          <a class="btn sm" href="/?marca=${esc(v.id)}" target="_blank">👀 Vista previa</a>
+          <button class="btn sm" data-copy="${esc(origin)}/?marca=${esc(v.id)}">🔗 Link</button>
+          <button class="btn sm" data-edit-variant="${esc(v.id)}">Editar</button>
+          ${same(v) ? '' : `<button class="btn sm primary" data-apply="${esc(v.id)}">Usar esta</button>`}
+          <button class="btn sm danger" data-del-variant="${esc(v.id)}">×</button>
+        </div></div>`).join('') || '<p class="muted">Todavía no guardaste variantes. Cargá un nombre y logo arriba y tocá "Guardar como variante", o creá una nueva.</p>'}</div>
+    </div>`;
+
+  const f = $('#bf');
+  const drawMocks = () => { const b = readBrand(f); $('#mocks').innerHTML = brandMock(b, 'dark') + brandMock(b, 'light'); };
+  drawMocks();
+  f.oninput = f.onchange = drawMocks;
+  bindLogo(view, 'cur', drawMocks);
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    try { const b = await api('/api/admin/brand', readBrand(f), 'PUT'); applyBrand(b); toast('Marca publicada ✔'); views.marca(); } catch (x) { err(x); }
+  };
+  $('#saveAsVariant').onclick = async () => {
+    try { await api('/api/admin/brand/variants', readBrand(f)); toast('Variante guardada'); views.marca(); } catch (x) { err(x); }
+  };
+  $('#promoBtn').onclick = async () => {
+    const { products } = await api('/api/site');
+    if (!products.length) return;
+    // la vista previa usa la marca guardada: si hay cambios sin guardar, avisamos
+    if (JSON.stringify(readBrand(f)) !== JSON.stringify({ name: current.name, tagline: current.tagline, accent: current.accent, logo: current.logo, logoMode: current.logoMode || 'logo+name' })) toast('Mostrando la marca guardada; guardá para ver los cambios');
+    const blob = await api('/api/admin/social/preview', { product_id: products[0].id, template: 'impacto' });
+    $('#promoPrev').innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="" style="max-height:340px">`;
+  };
+  const variantModal = (v) => {
+    modal(v ? `Editar variante: ${v.name}` : 'Nueva variante', `<div id="vf">${brandForm(v || { name: '', tagline: current.tagline, accent: current.accent, logoMode: 'logo+name' }, 'var')}</div><div style="margin-top:14px" id="vMock"></div>`, {
+      onSubmit: async () => {
+        const body = readBrand($('#vf'));
+        await (v ? api(`/api/admin/brand/variants/${v.id}`, body, 'PUT') : api('/api/admin/brand/variants', body));
+        toast('Variante guardada'); views.marca();
+      },
+    });
+    const vf = $('#vf');
+    const draw = () => { $('#vMock').innerHTML = brandMock(readBrand(vf), 'dark'); };
+    vf.oninput = vf.onchange = draw;
+    bindLogo($('#modalBody'), 'var', draw);
+    draw();
+  };
+  $('#newVariant').onclick = () => variantModal();
+  view.onclick = async (e) => {
+    const t = e.target.closest('[data-copy],[data-apply],[data-del-variant],[data-edit-variant]');
+    if (!t) return;
+    try {
+      if (t.dataset.copy) copy(t.dataset.copy);
+      if (t.dataset.editVariant) variantModal(variants.find((v) => v.id === t.dataset.editVariant));
+      if (t.dataset.apply && confirm('¿Publicar esta marca? Tus clientes la van a ver de inmediato.')) { applyBrand(await api(`/api/admin/brand/variants/${t.dataset.apply}/apply`, {})); toast('Marca publicada ✔'); views.marca(); }
+      if (t.dataset.delVariant && confirm('¿Borrar esta variante?')) { await api(`/api/admin/brand/variants/${t.dataset.delVariant}`, undefined, 'DELETE'); views.marca(); }
+    } catch (x) { err(x); }
+  };
+};
+
 /* ---------- Contenido ---------- */
 const CONTENT = {
-  site: ['General', [['name', 'Nombre de la tienda'], ['tagline', 'Frase'], ['announcement', 'Barra de anuncio (arriba de todo)', 'text', { full: true, hint: 'Dejala vacía para ocultarla' }], ['whatsapp', 'WhatsApp (con código de país, sin +)', 'text', { placeholder: '5491122334455' }], ['email', 'Email'], ['instagram', 'Instagram (URL)'], ['facebook', 'Facebook (URL)'], ['tiktok', 'TikTok (URL)'], ['mercadolibre', 'Tienda de MercadoLibre (URL)'], ['shippingFlat', 'Costo de envío', 'number'], ['freeShippingFrom', 'Envío gratis desde', 'number', { hint: '0 = nunca' }], ['accent', 'Color principal', 'color']]],
+  site: ['General', [['announcement', 'Barra de anuncio (arriba de todo)', 'text', { full: true, hint: 'Dejala vacía para ocultarla' }], ['whatsapp', 'WhatsApp (con código de país, sin +)', 'text', { placeholder: '5491122334455' }], ['email', 'Email'], ['instagram', 'Instagram (URL)'], ['facebook', 'Facebook (URL)'], ['tiktok', 'TikTok (URL)'], ['mercadolibre', 'Tienda de MercadoLibre (URL)'], ['shippingFlat', 'Costo de envío', 'number'], ['freeShippingFrom', 'Envío gratis desde', 'number', { hint: '0 = nunca' }]]],
   hero: ['Portada (hero)', [['visible', 'Mostrar', 'bool', { full: true }], ['eyebrow', 'Etiqueta superior'], ['title', 'Título', 'textarea', { rows: 2, hint: 'Cada renglón se anima por separado; el segundo va con degradado.' }], ['subtitle', 'Subtítulo', 'textarea'], ['ctaText', 'Botón principal'], ['ctaLink', 'Link botón principal'], ['secondaryText', 'Botón secundario'], ['secondaryLink', 'Link botón secundario'], ['showcase', 'Productos que "imprime" la animación', 'products']]],
   stats: ['Números', [['visible', 'Mostrar', 'bool', { full: true }], ['items', 'Datos', 'list', { fields: [['value', 'Valor'], ['label', 'Texto']] }]]],
   featured: ['Destacados', [['visible', 'Mostrar', 'bool', { full: true }], ['title', 'Título'], ['subtitle', 'Subtítulo']]],
@@ -346,6 +460,7 @@ views.contenido = async () => {
   const [label, fields] = CONTENT[contentTab];
   const f = fields.map((x) => (x[2] === 'products' ? [x[0], x[1], x[2], { products: site.products }] : x));
   view.innerHTML = `<div class="filters">${Object.entries(CONTENT).map(([k, [l]]) => `<button class="btn ${k === contentTab ? 'primary' : ''}" data-tab="${k}">${l}</button>`).join('')}</div>
+    ${contentTab === 'site' ? '<p class="hint">El nombre, el logo, la frase y el color se cambian en <a href="#marca">Marca y logo</a>.</p>' : ''}
     <form class="panel" id="cf"><h3>${label}<button type="button" class="btn sm" id="reset">Restaurar valores originales</button></h3>${renderForm(f, content[contentTab])}
       <div style="margin-top:18px;display:flex;gap:.6rem"><button class="btn primary">💾 Guardar</button><a class="btn" href="/" target="_blank">Ver cambios ↗</a></div></form>`;
   $$('[data-tab]').forEach((b) => { b.onclick = () => { contentTab = b.dataset.tab; views.contenido(); }; });
@@ -412,7 +527,7 @@ views.vendedores = async () => {
 /* ---------- Panel de un vendedor (lo usa el vendedor y el admin) ---------- */
 async function sellerDashboard(sellerId) {
   const d = await api(`/api/seller/me${sellerId ? `?seller_id=${sellerId}` : ''}`);
-  const { products } = await api('/api/site');
+  const { products, site } = await api('/api/site');
   const s = d.seller;
   setPage(sellerId ? `Vendedor: ${s.name}` : `¡Hola ${s.name.split(' ')[0]}!`, sellerId ? '<a class="btn" href="#vendedores">← Volver</a>' : '');
   view.innerHTML = `
@@ -426,7 +541,7 @@ async function sellerDashboard(sellerId) {
     <div class="cols-2">
       <div class="panel"><h3>Tus códigos</h3>${d.coupons.map((c) => {
         const link = `${d.site_url}/?ref=${c.code}`;
-        const msg = `🔥 Mirá los productos impresos en 3D de NITEN 3D. Con mi código *${c.code}* tenés ${c.type === 'percent' ? `${c.value}%` : money(c.value)} de descuento 👉 ${link}`;
+        const msg = `🔥 Mirá los productos impresos en 3D de ${site.name}. Con mi código *${c.code}* tenés ${c.type === 'percent' ? `${c.value}%` : money(c.value)} de descuento 👉 ${link}`;
         return `<div style="display:grid;gap:8px;padding:12px 0;border-bottom:1px solid var(--line)">
           <div><span class="tag accent" style="font-size:1rem">${esc(c.code)}</span> ${c.type === 'percent' ? `${c.value}% off` : `${money(c.value)} off`} ${c.active ? '' : '<span class="tag danger">pausado</span>'}</div>
           <div class="muted small">${c.visits} visitas · ${c.applied} veces aplicado · ${c.orders} pedidos · ${money(c.revenue)}</div>
@@ -666,6 +781,8 @@ function showLogin() {
   $('#app').hidden = true;
   $('#login').hidden = false;
 }
+
+api('/api/brand').then((b) => { applyBrand(b); document.title = `Panel · ${b.name}`; }).catch(() => {});
 
 async function start() {
   try { me = await api('/api/auth/me'); } catch { return showLogin(); }

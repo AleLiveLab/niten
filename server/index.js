@@ -33,7 +33,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(config.port, () => {
-  console.log(`\n  NITEN 3D corriendo en http://localhost:${config.port}`);
+  console.log(`\n  Tienda corriendo en http://localhost:${config.port}`);
   console.log(`  Panel de administración: http://localhost:${config.port}/admin\n`);
   if (config.jwtSecret === 'cambia-este-secreto') console.warn('  ⚠ Configurá JWT_SECRET en el archivo .env antes de publicar el sitio.');
   if (config.admin.password === 'admin123') console.warn('  ⚠ Cambiá la contraseña del administrador (ADMIN_PASSWORD o desde "Mi cuenta").');

@@ -4,16 +4,32 @@ const { db, getContent, productFromRow } = require('../db');
 const orders = require('../services/orders');
 const mp = require('../services/mercadopago');
 const images = require('../services/images');
+const brand = require('../services/brand');
 
 const router = express.Router();
 const PUBLIC_KEYS = ['site', 'hero', 'stats', 'featured', 'catalog', 'process', 'custom', 'testimonials', 'faq'];
 
 router.get('/api/site', (req, res) => {
   const content = Object.fromEntries(PUBLIC_KEYS.map((k) => [k, getContent(k, {})]));
+  // ?marca=<id>: muestra una variante de marca guardada sin publicarla
+  const preview = req.query.marca ? brand.findVariant(String(req.query.marca)) : null;
+  if (preview) content.site = { ...content.site, ...preview, preview: true };
   const categories = db.prepare('SELECT id, name, slug FROM categories ORDER BY sort, name').all();
   const products = db.prepare('SELECT * FROM products WHERE active = 1 ORDER BY sort, id').all().map(productFromRow)
     .map(({ ml_item_id, print_hours, created_at, updated_at, ...p }) => p);
   res.json({ ...content, categories, products, payments: { mercadopago: mp.enabled() }, currency: config.currency });
+});
+
+// Nombre, logo y color actuales (lo usan el panel y la página de pedidos)
+router.get('/api/brand', (req, res) => {
+  const v = req.query.marca ? brand.findVariant(String(req.query.marca)) : null;
+  res.json(v ? { ...brand.current(), ...v } : brand.current());
+});
+
+// Favicon: el logo si hay uno cargado
+router.get('/brand/favicon', (req, res) => {
+  const { logo } = brand.current();
+  res.set('Cache-Control', 'no-cache').redirect(logo || '/img/favicon.svg');
 });
 
 router.post('/api/cart/quote', (req, res, next) => {

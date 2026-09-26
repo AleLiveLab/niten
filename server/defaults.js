@@ -2,6 +2,8 @@
 module.exports = {
   site: {
     name: 'NITEN 3D',
+    logo: '',
+    logoMode: 'logo+name',
     tagline: 'Objetos impresos en 3D, diseñados para sorprender',
     announcement: '🚚 Envío gratis en compras desde $60.000 · Usá el código BIENVENIDA10',
     whatsapp: '5491100000000',
@@ -73,7 +75,7 @@ module.exports = {
   },
   bot: {
     enabled: true,
-    greeting: '¡Hola {nombre}! 👋 Soy el asistente de *NITEN 3D*.',
+    greeting: '¡Hola {nombre}! 👋 Soy el asistente de *{tienda}*.',
     menu: 'Escribí el número de una opción:\n1️⃣ Ver catálogo\n2️⃣ Promociones y códigos\n3️⃣ Estado de mi pedido\n4️⃣ Pedido personalizado\n5️⃣ Hablar con una persona',
     hours: 'Lunes a sábado de 9 a 20 h',
     human: 'Listo, te paso con una persona del equipo. Te respondemos a la brevedad 🙌 (horario: {horario}). Escribí *menu* para volver al asistente.',

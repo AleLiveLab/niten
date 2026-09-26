@@ -18,3 +18,20 @@ export function toast(text, kind = '') {
   box.appendChild(t);
   setTimeout(() => t.remove(), 3100);
 }
+
+// Contenido del logo: imagen y/o nombre según la configuración de la marca
+export function brandHTML(site) {
+  const mode = site.logoMode || 'logo+name';
+  const img = site.logo && mode !== 'name' ? `<img class="logo-img" src="${esc(site.logo)}" alt="${esc(site.name)}">` : '';
+  const mark = img || '<span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span>';
+  const name = !img || mode !== 'logo' ? `<span class="logo-text">${esc(site.name)}</span>` : '';
+  return mark + name;
+}
+
+// Aplica nombre, logo, color y favicon a la página
+export function applyBrand(site) {
+  document.querySelectorAll('[data-brand]').forEach((el) => { el.innerHTML = brandHTML(site); });
+  document.querySelectorAll('[data-brand-name]').forEach((el) => { el.textContent = site.name; });
+  if (site.accent) document.documentElement.style.setProperty('--accent', site.accent);
+  if (site.logo && !site.preview) document.querySelectorAll('link[rel=icon]').forEach((l) => { l.href = site.logo; l.type = 'image/png'; });
+}

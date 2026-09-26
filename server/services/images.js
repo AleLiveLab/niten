@@ -47,6 +47,26 @@ async function productImageData(product, size) {
   return `data:image/png;base64,${buf.toString('base64')}`;
 }
 
+// Logo y/o nombre de la marca, alineado a la izquierda en (x, y) = esquina superior
+async function brandMark(site, { x, y, h, color }) {
+  const mode = site.logoMode || 'logo+name';
+  const file = site.logo && mode !== 'name' ? localPath(site.logo) : null;
+  let out = '';
+  let textX = x;
+  if (file) {
+    const buf = await sharp(file).resize({ height: h * 2 }).png().toBuffer();
+    const { width, height } = await sharp(buf).metadata();
+    const w = Math.round((width / height) * h);
+    out += `<image href="data:image/png;base64,${buf.toString('base64')}" x="${x}" y="${y}" width="${w}" height="${h}"/>`;
+    textX = x + w + Math.round(h * 0.3);
+  }
+  if (!file || mode !== 'logo') {
+    const fs1 = Math.round(h * 0.55);
+    out += `<text x="${textX}" y="${y + h / 2 + fs1 * 0.36}" ${FONT} font-size="${fs1}" font-weight="900" fill="${color}" letter-spacing="${Math.round(fs1 / 7)}">${esc(site.name || '')}</text>`;
+  }
+  return out;
+}
+
 const TEMPLATES = {
   impacto: { w: 1080, h: 1080, label: 'Impacto (cuadrado, fondo oscuro)' },
   story: { w: 1080, h: 1920, label: 'Historia / Reel (vertical)' },
@@ -64,7 +84,6 @@ async function promoImage(product, opts = {}) {
   const headline = (opts.headline || product.name).toUpperCase();
   const discount = opts.discountText || (compare && compare > price ? `-${Math.round((1 - price / compare) * 100)}%` : '');
   const footer = opts.footer || new URL(require('../config').publicUrl).host;
-  const brand = esc(site.name || 'NITEN 3D');
 
   let svg;
   if (t === 'minimal') {
@@ -74,8 +93,8 @@ async function promoImage(product, opts = {}) {
       <rect width="100%" height="100%" fill="#f6f1ea"/>
       <circle cx="330" cy="560" r="330" fill="${accent}" opacity=".12"/>
       ${img ? `<clipPath id="c"><rect x="60" y="260" width="560" height="560" rx="48"/></clipPath><image href="${img}" x="60" y="260" width="560" height="560" clip-path="url(#c)"/>` : ''}
-      <text x="60" y="130" ${FONT} font-size="44" font-weight="800" fill="#1b1b1b" letter-spacing="6">${brand}</text>
-      <rect x="60" y="160" width="120" height="8" fill="${accent}"/>
+      ${await brandMark(site, { x: 60, y: 70, h: 76, color: '#1b1b1b' })}
+      <rect x="60" y="166" width="120" height="8" fill="${accent}"/>
       ${lines.map((l, i) => `<text x="660" y="${340 + i * 64}" ${FONT} font-size="54" font-weight="900" fill="#1b1b1b">${esc(l)}</text>`).join('')}
       ${compare && compare > price ? `<text x="660" y="${340 + lines.length * 64 + 40}" ${FONT} font-size="44" fill="#8a8a8a" text-decoration="line-through">${money(compare)}</text>` : ''}
       <text x="660" y="${340 + lines.length * 64 + 120}" ${FONT} font-size="76" font-weight="900" fill="${accent}">${money(price)}</text>
@@ -103,8 +122,8 @@ async function promoImage(product, opts = {}) {
       ${[1.18, 1.36, 1.56].map((k, i) => `<circle cx="${cx}" cy="${cy}" r="${imgSize / 2 * k}" fill="none" stroke="#fff" stroke-opacity="${0.18 - i * 0.05}" stroke-width="3" stroke-dasharray="${i === 1 ? '14 18' : 'none'}"/>`).join('')}
       ${Array.from({ length: 26 }, (_, i) => `<circle cx="${(i * 389) % w}" cy="${(i * 211) % h}" r="${2 + (i % 4)}" fill="#fff" opacity="${0.15 + (i % 5) / 12}"/>`).join('')}
       ${img ? `<g filter="url(#sh)"><circle cx="${cx}" cy="${cy}" r="${imgSize / 2 - 4}" fill="#fff"/><image href="${img}" x="${cx - imgSize / 2}" y="${imgY}" width="${imgSize}" height="${imgSize}" clip-path="url(#c)"/></g>` : ''}
-      <text x="60" y="${vertical ? 140 : 90}" ${FONT} font-size="${vertical ? 52 : 40}" font-weight="900" fill="#fff" letter-spacing="8">${brand}</text>
-      <rect x="60" y="${vertical ? 165 : 108}" width="${vertical ? 160 : 110}" height="8" rx="4" fill="url(#bar)"/>
+      ${await brandMark(site, { x: 60, y: vertical ? 70 : 40, h: vertical ? 96 : 72, color: '#fff' })}
+      <rect x="60" y="${vertical ? 180 : 124}" width="${vertical ? 160 : 110}" height="8" rx="4" fill="url(#bar)"/>
       ${discount ? `<g transform="translate(${w - (vertical ? 200 : 170)} ${vertical ? 200 : 150}) rotate(-12)">
         <polygon points="${Array.from({ length: 24 }, (_, i) => { const r = i % 2 ? (vertical ? 120 : 100) : (vertical ? 150 : 128); const a = Math.PI / 12 * i; return `${(r * Math.cos(a)).toFixed(1)},${(r * Math.sin(a)).toFixed(1)}`; }).join(' ')}" fill="url(#bar)"/>
         <text y="${vertical ? 22 : 18}" text-anchor="middle" ${FONT} font-size="${vertical ? 64 : 54}" font-weight="900" fill="#140b24">${esc(discount)}</text></g>` : ''}

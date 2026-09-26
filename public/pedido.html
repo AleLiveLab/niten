@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Estado de tu pedido · NITEN 3D</title>
-  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <title>Estado de tu pedido</title>
+  <link rel="icon" href="/brand/favicon">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/store.css">
 </head>
 <body>
-  <header class="header scrolled"><a href="/" class="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="logo-text">NITEN 3D</span></a><a class="btn btn-ghost btn-small" href="/">Volver a la tienda</a></header>
+  <header class="header scrolled"><a href="/" class="logo" data-brand></a><a class="btn btn-ghost btn-small" href="/">Volver a la tienda</a></header>
   <main class="order-page">
     <form class="order-card" id="lookup" hidden>
       <h1>Seguí tu pedido</h1>
@@ -19,7 +19,8 @@
     <section class="order-card" id="order" hidden></section>
   </main>
   <script type="module">
-    import { money, esc, api } from '/js/common.js';
+    import { money, esc, api, applyBrand } from '/js/common.js';
+    api('/api/brand').then((b) => { applyBrand(b); document.title = `Estado de tu pedido · ${b.name}`; });
     const steps = [['nuevo', '🕐', 'Recibido'], ['pagado', '💳', 'Pagado'], ['en_produccion', '🖨️', 'Imprimiendo'], ['enviado', '🚚', 'Enviado'], ['entregado', '✅', 'Entregado']];
     const code = new URLSearchParams(location.search).get('code');
     const lookup = document.getElementById('lookup');

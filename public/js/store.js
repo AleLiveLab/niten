@@ -1,4 +1,4 @@
-import { money, esc, api, toast } from './common.js';
+import { money, esc, api, toast, applyBrand } from './common.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -60,9 +60,9 @@ function card(p, i = 0) {
 function renderContent() {
   const d = state.data;
   const site = d.site;
-  document.documentElement.style.setProperty('--accent', site.accent || '#ff5a1f');
+  applyBrand(site);
   document.title = `${site.name} · ${site.tagline}`;
-  $$('.logo-text').forEach((el) => { el.textContent = site.name; });
+  $('#brandPreview').hidden = !site.preview;
   $('#copyName').textContent = site.name;
   $('#year').textContent = new Date().getFullYear();
   $('#footerTagline').textContent = site.tagline;
@@ -460,7 +460,8 @@ function route() {
 async function init() {
   bind();
   await trackRef();
-  state.data = await fetch('/api/site').then((r) => r.json());
+  const marca = new URLSearchParams(location.search).get('marca');
+  state.data = await fetch(`/api/site${marca ? `?marca=${encodeURIComponent(marca)}` : ''}`).then((r) => r.json());
   renderContent();
   renderGrid();
   refreshCart();

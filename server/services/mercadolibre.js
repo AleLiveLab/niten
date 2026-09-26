@@ -59,7 +59,7 @@ async function publish(productId) {
 
   const [guess] = await request(`${API}/sites/${site}/domain_discovery/search?limit=1&q=${encodeURIComponent(p.name + ' impresion 3d')}`);
   if (!guess) throw new Error('MercadoLibre no sugirió una categoría para este producto');
-  const brand = getContent('site', {}).name || 'NITEN 3D';
+  const brand = getContent('site', {}).name || 'Tienda';
   const item = await api('/items', {
     method: 'POST',
     json: {

@@ -1,7 +1,7 @@
 const config = require('../config');
 const { creds } = require('../settings');
 const { request } = require('./http');
-const { db } = require('../db');
+const { db, getContent } = require('../db');
 const orders = require('./orders');
 
 const API = 'https://api.mercadopago.com';
@@ -22,7 +22,7 @@ async function createPreference(order) {
       payer: { name: order.customer_name, email: order.email || undefined },
       back_urls: { success: back, pending: back, failure: back },
       ...(isPublic ? { auto_return: 'approved', notification_url: `${config.publicUrl}/webhooks/mercadopago` } : {}),
-      statement_descriptor: 'NITEN3D',
+      statement_descriptor: (getContent('site', {}).name || 'TIENDA').normalize('NFD').replace(/[^A-Za-z0-9 ]/g, '').toUpperCase().slice(0, 13),
     },
   });
   return pref.init_point;
