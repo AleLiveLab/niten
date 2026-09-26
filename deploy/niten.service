@@ -1,0 +1,15 @@
+# Alternativa a Docker: servicio systemd.
+# sudo cp deploy/niten.service /etc/systemd/system/ && sudo systemctl enable --now niten
+[Unit]
+Description=NITEN 3D tienda
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/niten
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+User=www-data
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

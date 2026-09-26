@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NITEN 3D · Impresiones 3D</title>
+  <meta name="description" content="Figuras articuladas, lámparas, decoración y accesorios impresos en 3D.">
+  <meta name="theme-color" content="#0b0714">
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+  <div class="announce" id="announce"><div class="announce-track"></div></div>
+
+  <header class="header" id="header">
+    <a href="#" class="logo" id="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="logo-text">NITEN 3D</span></a>
+    <nav class="nav" id="nav">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#personalizado">Personalizados</a>
+      <a href="#proceso">Cómo trabajamos</a>
+      <a href="#faq">Preguntas</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-btn ml-link" id="mlLink" target="_blank" rel="noopener" title="Tienda en MercadoLibre" hidden>ML</a>
+      <button class="icon-btn cart-btn" id="cartBtn" aria-label="Abrir carrito">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menú"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-bg" aria-hidden="true"><div class="grid-floor"></div><div class="orb orb-a"></div><div class="orb orb-b"></div><canvas id="particles"></canvas></div>
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <span class="eyebrow" id="heroEyebrow"></span>
+          <h1 id="heroTitle"></h1>
+          <p class="lead" id="heroSubtitle"></p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" id="heroCta" href="#catalogo"></a>
+            <a class="btn btn-ghost" id="heroCta2" href="#personalizado"></a>
+          </div>
+        </div>
+        <div class="printer" id="printer" aria-hidden="true">
+          <div class="printer-frame">
+            <div class="gantry"><div class="nozzle"><span></span></div></div>
+            <div class="bed">
+              <div class="print-stage">
+                <img class="print-ghost" alt="">
+                <img class="print-obj" alt="">
+                <div class="print-line"></div>
+              </div>
+            </div>
+          </div>
+          <div class="printer-meta"><span class="dot"></span><span id="printName">Imprimiendo…</span><span class="pct" id="printPct">0%</span></div>
+        </div>
+      </div>
+      <a class="scroll-hint" href="#stats" aria-label="Bajar"><span></span></a>
+    </section>
+
+    <section class="stats" id="stats"></section>
+
+    <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
+
+    <section class="section" id="destacados">
+      <div class="section-head reveal"><h2 id="featuredTitle"></h2><p id="featuredSubtitle"></p></div>
+      <div class="featured-rail" id="featured"></div>
+    </section>
+
+    <section class="section" id="catalogo">
+      <div class="section-head reveal"><h2 id="catalogTitle"></h2><p id="catalogSubtitle"></p></div>
+      <div class="catalog-tools reveal">
+        <div class="chips" id="chips"></div>
+        <div class="tools-right">
+          <input type="search" id="search" placeholder="Buscar…" aria-label="Buscar productos">
+          <select id="sort" aria-label="Ordenar">
+            <option value="">Destacados</option>
+            <option value="price-asc">Menor precio</option>
+            <option value="price-desc">Mayor precio</option>
+            <option value="new">Novedades</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <p class="empty" id="empty" hidden>No encontramos productos con esos filtros.</p>
+    </section>
+
+    <section class="section process" id="proceso">
+      <div class="section-head reveal"><h2 id="processTitle"></h2></div>
+      <ol class="steps" id="steps"></ol>
+    </section>
+
+    <section class="section" id="personalizado">
+      <div class="custom-card reveal">
+        <div class="custom-copy"><h2 id="customTitle"></h2><p id="customText"></p><a class="btn btn-primary" id="customCta" target="_blank" rel="noopener"></a></div>
+        <div class="custom-art" aria-hidden="true"><div class="cube"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+      </div>
+    </section>
+
+    <section class="section" id="opiniones">
+      <div class="section-head reveal"><h2 id="testimonialsTitle"></h2></div>
+      <div class="testimonials" id="testimonials"></div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="section-head reveal"><h2 id="faqTitle"></h2></div>
+      <div class="faq" id="faqList"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div><a href="#" class="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="logo-text" id="footerName">NITEN 3D</span></a><p id="footerTagline"></p></div>
+      <div class="footer-links" id="footerLinks"></div>
+    </div>
+    <p class="copy">© <span id="year"></span> <span id="copyName"></span> · Hecho capa por capa</p>
+  </footer>
+
+  <a class="wa-float" id="waFloat" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp" hidden>
+    <svg viewBox="0 0 32 32" width="30" height="30" fill="currentColor"><path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.7a10.7 10.7 0 0 1-5.5-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.7 10.7 0 1 1 16 26.7zm5.9-8c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.8 8.8 0 0 1-4.4-3.8c-.3-.6.3-.5 1-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.8.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c-.1-.2-.3-.3-.6-.4z"/></svg>
+  </a>
+
+  <!-- Producto -->
+  <div class="modal" id="productModal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <article class="modal-card product-view" role="dialog" aria-modal="true" aria-labelledby="pvName">
+      <button class="modal-close" data-close aria-label="Cerrar">×</button>
+      <div class="pv-gallery"><div class="pv-main"><img id="pvImg" alt=""></div><div class="pv-thumbs" id="pvThumbs"></div></div>
+      <div class="pv-info">
+        <span class="pv-cat" id="pvCat"></span>
+        <h2 id="pvName"></h2>
+        <div class="pv-price"><strong id="pvPrice"></strong><s id="pvCompare"></s></div>
+        <p id="pvDesc"></p>
+        <dl class="pv-specs" id="pvSpecs"></dl>
+        <div class="pv-colors"><span>Color</span><div id="pvColors"></div></div>
+        <div class="pv-buy">
+          <div class="qty"><button data-q="-1" aria-label="Menos">−</button><input id="pvQty" type="number" min="1" value="1" aria-label="Cantidad"><button data-q="1" aria-label="Más">+</button></div>
+          <button class="btn btn-primary" id="pvAdd">Agregar al carrito</button>
+        </div>
+        <p class="pv-stock" id="pvStock"></p>
+        <div class="pv-share"><span>Compartir:</span><a id="pvShareWa" target="_blank" rel="noopener">WhatsApp</a><a id="pvShareFb" target="_blank" rel="noopener">Facebook</a><button id="pvCopy">Copiar link</button><a id="pvMl" target="_blank" rel="noopener" hidden>Ver en MercadoLibre</a></div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Carrito -->
+  <aside class="drawer" id="cart" aria-hidden="true">
+    <div class="drawer-backdrop" data-close-cart></div>
+    <div class="drawer-panel" role="dialog" aria-label="Carrito">
+      <header><h3>Tu carrito</h3><button class="modal-close" data-close-cart aria-label="Cerrar">×</button></header>
+      <div class="free-ship" id="freeShip"><div class="bar"><span></span></div><p></p></div>
+      <ul class="cart-lines" id="cartLines"></ul>
+      <div class="cart-empty" id="cartEmpty"><div class="spool"></div><p>Tu carrito está vacío</p><a class="btn btn-ghost" href="#catalogo" data-close-cart>Ver productos</a></div>
+      <footer id="cartFooter">
+        <form class="coupon" id="couponForm"><input id="couponInput" placeholder="Código de descuento" autocomplete="off"><button class="btn btn-small">Aplicar</button></form>
+        <p class="coupon-msg" id="couponMsg"></p>
+        <dl class="totals" id="totals"></dl>
+        <button class="btn btn-primary btn-block" id="checkoutBtn">Finalizar compra</button>
+      </footer>
+    </div>
+  </aside>
+
+  <!-- Checkout -->
+  <div class="modal" id="checkoutModal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card checkout" role="dialog" aria-modal="true" aria-labelledby="coTitle">
+      <button class="modal-close" data-close aria-label="Cerrar">×</button>
+      <h2 id="coTitle">Finalizar compra</h2>
+      <form id="checkoutForm">
+        <div class="fields">
+          <label>Nombre y apellido<input name="name" required autocomplete="name"></label>
+          <label>WhatsApp / teléfono<input name="phone" required autocomplete="tel" inputmode="tel"></label>
+          <label>Email<input name="email" type="email" autocomplete="email"></label>
+          <label>Ciudad<input name="city" autocomplete="address-level2"></label>
+          <label class="full">Dirección de envío<input name="address" autocomplete="street-address"></label>
+          <label class="full">Notas (color, personalización, horario de entrega…)<textarea name="notes" rows="2"></textarea></label>
+        </div>
+        <fieldset class="pay" id="payOptions">
+          <legend>Forma de pago</legend>
+          <label data-mp><input type="radio" name="payment" value="mercadopago" checked> Mercado Pago <small>tarjetas, débito, dinero en cuenta</small></label>
+          <label><input type="radio" name="payment" value="transferencia"> Transferencia / coordinar por WhatsApp</label>
+        </fieldset>
+        <dl class="totals" id="coTotals"></dl>
+        <p class="form-error" id="coError"></p>
+        <button class="btn btn-primary btn-block" id="coSubmit">Confirmar pedido</button>
+      </form>
+      <div class="co-done" id="coDone" hidden>
+        <div class="check"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M14 27l8 8 16-16"/></svg></div>
+        <h3>¡Pedido recibido!</h3>
+        <p>Tu código de pedido es <strong id="coCode"></strong>. Guardalo para consultar el estado.</p>
+        <a class="btn btn-primary" id="coWa" target="_blank" rel="noopener">Enviar comprobante por WhatsApp</a>
+        <a class="btn btn-ghost" id="coTrack">Ver estado del pedido</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <script src="/js/store.js" type="module"></script>
+</body>
+</html>

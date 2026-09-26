@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estado de tu pedido · NITEN 3D</title>
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/store.css">
+</head>
+<body>
+  <header class="header scrolled"><a href="/" class="logo"><span class="logo-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="logo-text">NITEN 3D</span></a><a class="btn btn-ghost btn-small" href="/">Volver a la tienda</a></header>
+  <main class="order-page">
+    <form class="order-card" id="lookup" hidden>
+      <h1>Seguí tu pedido</h1>
+      <div class="coupon"><input name="code" placeholder="NT-XXXXXX" required><button class="btn btn-primary btn-small">Buscar</button></div>
+      <p class="form-error" id="err"></p>
+    </form>
+    <section class="order-card" id="order" hidden></section>
+  </main>
+  <script type="module">
+    import { money, esc, api } from '/js/common.js';
+    const steps = [['nuevo', '🕐', 'Recibido'], ['pagado', '💳', 'Pagado'], ['en_produccion', '🖨️', 'Imprimiendo'], ['enviado', '🚚', 'Enviado'], ['entregado', '✅', 'Entregado']];
+    const code = new URLSearchParams(location.search).get('code');
+    const lookup = document.getElementById('lookup');
+    lookup.onsubmit = (e) => { e.preventDefault(); location.search = '?code=' + encodeURIComponent(lookup.code.value.trim().toUpperCase()); };
+    if (!code) lookup.hidden = false;
+    else api('/api/orders/' + encodeURIComponent(code)).then((o) => {
+      const idx = steps.findIndex(([s]) => s === o.status);
+      const el = document.getElementById('order');
+      el.hidden = false;
+      el.innerHTML = `<h1>¡Hola ${esc(o.customer_name)}!</h1><p>Pedido <strong>${esc(o.code)}</strong> · Pago: <strong>${esc(o.payment_status)}</strong></p>
+        ${o.status === 'cancelado' ? '<p class="form-error">Este pedido fue cancelado.</p>' : `<ol class="timeline">${steps.map(([s, i, l], k) => `<li data-icon="${i}" class="${k <= idx ? 'done' : ''}" style="animation-delay:${k * .15}s">${l}</li>`).join('')}</ol>`}
+        <ul class="order-items">${o.items.map((l) => `<li><span>${l.qty}× ${esc(l.name)}</span><span>${money(l.total)}</span></li>`).join('')}</ul>
+        <dl class="totals"><dt>Subtotal</dt><dd>${money(o.subtotal)}</dd>${o.discount ? `<dt class="discount">Descuento</dt><dd class="discount">−${money(o.discount)}</dd>` : ''}<dt>Envío</dt><dd>${o.shipping ? money(o.shipping) : 'Gratis'}</dd><dt class="grand">Total</dt><dd class="grand">${money(o.total)}</dd></dl>`;
+    }).catch((e) => { lookup.hidden = false; document.getElementById('err').textContent = e.message; });
+  </script>
+</body>
+</html>

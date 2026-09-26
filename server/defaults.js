@@ -1,0 +1,92 @@
+// Contenido editable del sitio (todo esto se modifica desde el panel de administración).
+module.exports = {
+  site: {
+    name: 'NITEN 3D',
+    tagline: 'Objetos impresos en 3D, diseñados para sorprender',
+    announcement: '🚚 Envío gratis en compras desde $60.000 · Usá el código BIENVENIDA10',
+    whatsapp: '5491100000000',
+    email: 'hola@niten3d.com',
+    instagram: 'https://instagram.com/',
+    facebook: 'https://facebook.com/',
+    tiktok: 'https://tiktok.com/',
+    mercadolibre: 'https://www.mercadolibre.com.ar/',
+    shippingFlat: 4500,
+    freeShippingFrom: 60000,
+    accent: '#ff5a1f',
+  },
+  hero: {
+    visible: true,
+    eyebrow: 'Impresión 3D artesanal',
+    title: 'Capa por capa,\nideas que cobran vida',
+    subtitle: 'Figuras articuladas, lámparas, decoración y accesorios únicos. Impresos a pedido con materiales de primera calidad.',
+    ctaText: 'Ver catálogo',
+    ctaLink: '#catalogo',
+    secondaryText: 'Pedí tu diseño',
+    secondaryLink: '#personalizado',
+    showcase: ['dragon-articulado', 'lampara-luna', 'astronauta-chibi', 'jarron-espiral', 'maceta-low-poly'],
+  },
+  stats: {
+    visible: true,
+    items: [
+      { value: '+2.500', label: 'piezas impresas' },
+      { value: '4.9★', label: 'valoración promedio' },
+      { value: '48 h', label: 'para productos en stock' },
+      { value: '100%', label: 'hecho en casa' },
+    ],
+  },
+  featured: { visible: true, title: 'Lo más buscado', subtitle: 'Las piezas favoritas de la comunidad' },
+  catalog: { visible: true, title: 'Catálogo', subtitle: 'Filtrá por categoría y encontrá tu próxima pieza' },
+  process: {
+    visible: true,
+    title: '¿Cómo lo hacemos?',
+    steps: [
+      { icon: '✏️', title: 'Diseño', text: 'Modelamos o adaptamos cada pieza para que sea resistente y se vea increíble.' },
+      { icon: '🧵', title: 'Filamento', text: 'Elegimos PLA, PETG o resina según el uso y el acabado que buscás.' },
+      { icon: '🖨️', title: 'Impresión', text: 'Horas de impresión capa por capa, controladas de principio a fin.' },
+      { icon: '📦', title: 'Terminación y envío', text: 'Limpiamos, revisamos y embalamos con cuidado para que llegue perfecto.' },
+    ],
+  },
+  custom: {
+    visible: true,
+    title: '¿Tenés una idea? La imprimimos.',
+    text: 'Regalos personalizados, repuestos, prototipos, merchandising para tu marca. Contanos qué necesitás y te pasamos presupuesto en el día.',
+    ctaText: 'Pedir presupuesto por WhatsApp',
+  },
+  testimonials: {
+    visible: true,
+    title: 'Lo que dicen nuestros clientes',
+    items: [
+      { name: 'Lucía M.', text: 'El dragón articulado es una locura, mi hijo no lo suelta. Llegó súper bien embalado.', rating: 5 },
+      { name: 'Martín G.', text: 'Pedí llaveros personalizados para mi emprendimiento y quedaron perfectos. Muy buena atención.', rating: 5 },
+      { name: 'Sofía R.', text: 'La lámpara luna queda hermosa en el cuarto. Calidad de terminación impecable.', rating: 5 },
+    ],
+  },
+  faq: {
+    visible: true,
+    title: 'Preguntas frecuentes',
+    items: [
+      { q: '¿Cuánto tarda mi pedido?', a: 'Los productos en stock salen en 48 h hábiles. Los pedidos a medida demoran entre 3 y 7 días según la complejidad.' },
+      { q: '¿Qué materiales usan?', a: 'Principalmente PLA biodegradable y PETG para piezas que necesitan más resistencia. Para miniaturas de alto detalle usamos resina.' },
+      { q: '¿Puedo elegir el color?', a: 'Sí. En cada producto vas a ver los colores disponibles, y si buscás otro, escribinos.' },
+      { q: '¿Hacen envíos a todo el país?', a: 'Sí, enviamos a todo el país. También podés comprarnos por MercadoLibre.' },
+    ],
+  },
+  bot: {
+    enabled: true,
+    greeting: '¡Hola {nombre}! 👋 Soy el asistente de *NITEN 3D*.',
+    menu: 'Escribí el número de una opción:\n1️⃣ Ver catálogo\n2️⃣ Promociones y códigos\n3️⃣ Estado de mi pedido\n4️⃣ Pedido personalizado\n5️⃣ Hablar con una persona',
+    hours: 'Lunes a sábado de 9 a 20 h',
+    human: 'Listo, te paso con una persona del equipo. Te respondemos a la brevedad 🙌 (horario: {horario}). Escribí *menu* para volver al asistente.',
+    custom: 'Contanos qué querés imprimir: medidas aproximadas, color y, si tenés, una foto o link de referencia. Te pasamos presupuesto en el día ✨',
+    fallback: 'No entendí tu mensaje 🤔. Escribí *menu* para ver las opciones o el nombre de un producto para buscarlo.',
+    faq: [
+      { keywords: 'envio,envío,envios,envían', answer: 'Enviamos a todo el país 📦. Envío gratis en compras desde $60.000.' },
+      { keywords: 'pago,pagos,tarjeta,transferencia,mercado pago', answer: 'Aceptamos Mercado Pago (tarjetas, débito, dinero en cuenta) y transferencia bancaria.' },
+      { keywords: 'color,colores', answer: 'Cada producto tiene colores disponibles en la web. ¡Si querés otro color escribinos!' },
+    ],
+  },
+  social: {
+    hashtags: '#impresion3d #3dprinting #hechoamano #deco #regalos',
+    captionTemplate: '✨ {nombre} ✨\n\n{descripcion}\n\n💥 {precio}{descuento}\n🛒 Compralo en {link}\n\n{hashtags}',
+  },
+};
